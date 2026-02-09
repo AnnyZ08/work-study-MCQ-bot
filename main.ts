@@ -34,36 +34,35 @@ async function loadFolderAsContext(folderPath: string): Promise<string> {
 }
 
 serve(async (req: Request): Promise<Response> => {
-  // to populate list options
-    if (req.method === "GET") {
-      const files: string[] = [];
-
-      for await (const entry of Deno.readDir("./test_transcripts")) {
-        if (entry.isFile && entry.name.endsWith(".txt")) {
-          files.push(entry.name);
-        }
-      }
-
-      return new Response(JSON.stringify(files), {
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type",
       },
     });
   }
 
-  if (req.method !== "POST") {
-    return new Response("Method Not Allowed", { status: 405 });
+    // to populate list options
+  if (req.method === "GET") {
+    const files: string[] = [];
+
+    for await (const entry of Deno.readDir("./test_transcripts")) {
+      if (entry.isFile && entry.name.endsWith(".txt")) {
+        files.push(entry.name);
+      }
+    }
+
+    return new Response(JSON.stringify(files), {
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*", },
+    });
   }
+
+//   if (req.method !== "POST") {
+//     return new Response("Method Not Allowed", { status: 405 });
+//   }
 
   type RequestBody = {
     mode: string;
