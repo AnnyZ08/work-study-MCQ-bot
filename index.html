@@ -169,22 +169,33 @@
 
     loadTranscriptOptions();
 
-<!--    submitBtn.addEventListener("click", async () => {-->
-<!--      const selected = document.querySelector('input[name="mode"]:checked');-->
+    submitBtn.addEventListener("click", async () => {
 
-<!--      if (!selected) {-->
-<!--        responseBox.textContent = "Please select an option.";-->
-<!--        responseBox.classList.remove("placeholder");-->
-<!--        return;-->
-<!--      }-->
+        const selected = document.querySelector('input[name="mode"]:checked');
 
-<!--      const mode = selected.value;-->
+        if (!selected) {
+            responseBox.textContent = "Please select a transcript.";
+            return;
+        }
+        const transcriptFile = selected.value;
 
-<!--      // UI feedback only (backend unchanged for now)-->
-<!--      responseBox.classList.remove("placeholder");-->
-<!--      responseBox.textContent = `Selected mode: ${mode}\n\nWaiting for backend integration...`;-->
+        responseBox.classList.remove("placeholder");
+        responseBox.textContent = "Generating questions...";
 
-<!--    });-->
+        try {
+            const res = await fetch("https://annyz08-mcq-bot.deno.dev/", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    transcript: transcriptFile
+                }),
+            });
+            const text = await res.text();
+            responseBox.textContent = text;
+        } catch (err) {
+        responseBox.textContent = "Error contacting server.";
+        }
+    });
   </script>
 </body>
 </html>
