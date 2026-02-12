@@ -101,8 +101,18 @@ serve(async (req: Request): Promise<Response> => {
 
         // Send transcriptContent to Gemini
         const prompt = `
-          Generate 5 high-quality multiple choice questions based on the following transcript:
+          You are an academic instructor and want to help student to prepare for exams.
 
+          Using ONLY the content provided in the transcript below, generate 10 high-quality multiple choice questions for student to practice.
+
+          Requirements:
+          - Each question must be directly answerable using the transcript.
+          - Do NOT use outside knowledge.
+          - Only one correct answer per question.
+          - Provide the correct answer clearly after each question.
+          - Questions should test understanding, not trivial wording.
+
+          Transcript:
           ${transcriptContent}
           `;
 
