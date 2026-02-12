@@ -63,7 +63,7 @@ serve(async (req: Request): Promise<Response> => {
   }
 
 // Post method
-  if (req.method === "POST" && url.pathname === "/") {
+  if (req.method === "POST") {
         const body = await req.json();
         const transcript = body.transcript;
 
