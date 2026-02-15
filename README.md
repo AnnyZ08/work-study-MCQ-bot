@@ -1,20 +1,20 @@
-# Syllabus Bot (OpenAI, Deno)
+# Multiple Choice Question Bot (Gemini, Deno)
 
-Minimal bot that answers course/assignment questions using OpenAI with `syllabus.md` as context. Embeds in Brightspace and can optionally log to Qualtrics.
+Minimal bot that helps student to practice for exams by generating high quality multiple choice questions based on the lectures provided. It uses Gemini 2.5 flash and can optionally log to Qualtrics.
 
 ## Features
-- Accepts free-text questions
-- Combines three bots together and allows user to select the specific bot
-- Calls OpenAI with `syllabus.md`
-- Optionally logs `{queryText, responseText}` to Qualtrics
+- Can upload many lecture contents and they will be automatically included as options
+- Allows user to select the specific lecture to generate question from
+- Optionally logs `{lectureName, responseText}` to Qualtrics
 - Works as a standalone web page or Brightspace embed
 
 ## 1. Create your copy
-- Use this template on GitHub (e.g., `syllabus-bot-3210`, `paragraph-marker`)
+- Fork this repository or use this template on GitHub (e.g., `syllabus-bot-3210`, `paragraph-marker`)
 
-## 2. Replace syllabus content
-- Edit `syllabus.md` and `midterm.md` and `final.md` with your course policies and course information (this text is sent with each query)
-- ***Please do not change the file names, only edit the content.
+## 2. Replace lecture content
+- Remove the existing lectures and put your lecture content in `1026_midterm_transcripts` folder
+- ***Please do not change the folder names, only edit the content.
+
 ## 3. Deploy backend to Deno
 - Sign in at https://dash.deno.com → **+ New Project** → **Add Github Account** → **Install Deno** -> Click linked account
 - Select your repo
@@ -25,18 +25,18 @@ Minimal bot that answers course/assignment questions using OpenAI with `syllabus
 ## 4. Add environment variables
 In **Deno → Settings → Environment Variables**, add:
 
-    OPENAI_API_KEY=your OpenAI API key
-    SYLLABUS_LINK=public link to the syllabus or course webpage
+    GEMINI_API_KEY=your Gemini API key
     QUALTRICS_API_TOKEN=(optional)
     QUALTRICS_SURVEY_ID=(optional)
     QUALTRICS_DATACENTER=(optional, e.g., uwo.eu)
-    OPENAI_MODEL=(optional, default gpt-4o-mini)
+    GEMINI_MODEL=(optional, default gemini-2.5-flash)
 
 Qualtrics variables can be accessed through: 
-- **Qualtrics -> Creat New Project -> Survey Flow** -> Add Two **Embedded Data (repsonseText, QueryText) -> Apply**
+- **Qualtrics -> Creat New Project -> Survey Flow** -> Add Two **Embedded Data (repsonseText, lectureName) -> Apply**
 - Go back to homepage and activate the survey
 - Get SURVEY_ID from URL
 - Generate API_TOKEN from user settings
+- QUALTRICS_DATACENTER can be found in the first part of survey url, ex. 'uwo.eu'
 
 ## 5. Point the frontend to your backend
 In `index.html`, replace the fetch URL with your Deno URL, e.g.:
@@ -53,30 +53,24 @@ In `index.html`, replace the fetch URL with your Deno URL, e.g.:
 - Use the published URL (e.g., `https://yourusername.github.io/yourbot/`)
 - For Brightspace, you can also paste `brightspace.html` as a content item or widget
 
-## 7. Enable or Disable bots
-- If there are multiple bots and you want to enable or disable bots, edit `index.html` line 98 and 99. Change values to true if you want the bot to be locked (NOT showed on the page), false if you want to show the bots.
-- Save changes on GitHub, you don't have to deploy the webpage again. The changes will be automatically synced once you save.
-
-## 8. Adjust input token limit
-- I added a check for the input file size to prevent failing. The limit I set is 200k, based on the model I used. Feel free to set it to higher or lower based on different models.
-- Change the limit in `main.ts` line 25.
+## 8. Adjust input/output token limit
+- Responses are capped at **10000 tokens**; Change the output token limit in `main.ts` line 110.
 
 ## Notes
 - CORS headers are returned by `main.ts`, so the Brightspace iframe can call your backend.
 - Each deployment has its own backend; ensure the frontend fetch URL matches the correct Deno project.
-- Responses are capped at **1500 tokens**; increase `max_tokens` in `main.ts` if you need longer answers.
-- Hitting OpenAI usage/quota limits may surface as a generic server error—retry or switch to a cheaper model via `OPENAI_MODEL`.
+- The gemini free version is typically limited to a 32,000-token input context window, paid tier can go up to 1 million token window.
+- Here is the link to all Gemini models and pricing: https://ai.google.dev/gemini-api/docs/pricing#gemini-3-pro-preview.
 
 ## Qualtrics (optional)
-- In your survey, add embedded data fields: `responseText`, `queryText`.
+- In your survey, add embedded data fields: `responseText`, `lectureName`.
 - The response includes an HTML comment like `<!-- Qualtrics status: 200 -->` to confirm logging.
 
 ## Files
 - `index.html` — public interface
 - `brightspace.html` — LMS-friendly wrapper
 - `main.ts` — Deno backend (OpenAI API)
-- `syllabus.md` — syllabus/grading text used as context
 - `README.md` — this file
 
 ## License
-© Dan Bousfield. CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/
+© Anny Zheng
